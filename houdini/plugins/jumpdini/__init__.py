@@ -32,44 +32,4 @@ class Jumpdini(IPlugin):
         tr.expire(f'{p.username}.jumpkey', 120)
         await tr.execute()
         await p.room.send_xt('sjf', p.id)
-        await p.send_xt('sj', 'jumpline', 'jumping')
-        
-        
-    @handlers.handler(XMLPacket('login'), client=ClientType.Vanilla)
-    @handlers.allow_once
-    @handlers.depends_on_packet(XMLPacket('verChk'), XMLPacket('rndK'))
-    async def handle_login(p, credentials: WorldCredentials):
-        data = await Penguin.get(credentials.id)
-        if await p.server.redis.exists(f"{p.username}.jumpkey"):
-            return await world_login(p, data)
-        else:
-            tr = p.server.redis.multi_exec()
-            tr.get(f'{credentials.username}.lkey')
-            tr.get(f'{credentials.username}.ckey')
-            tr.delete(f'{credentials.username}.lkey', f'{credentials.username}.ckey')
-            login_key, confirmation_hash, _ = await tr.execute()
-    
-    
-            if login_key is None or confirmation_hash is None:
-                if await p.server.redis.exists(f"{data.username}.jumpkey"):
-                    return await world_login(p, data)
-                else:
-                    return await p.close()
-
-            login_key = login_key.decode()
-            login_hash = Crypto.encrypt_password(login_key + p.server.config.auth_key) + login_key
-        
-            if credentials.client_key != login_hash:
-                if await p.server.redis.exists(f"{data.username}.jumpkey"):
-                    return await world_login(p, data)
-                else:
-                    return await p.close()
-
-            if login_key != credentials.login_key or confirmation_hash.decode() != credentials.confirmation_hash:
-                if await p.server.redis.exists(f"{data.username}.jumpkey"):
-                    return await world_login(p, data)
-                else:
-                    return await p.close()
-            
-            p.login_key = login_key
-            await world_login(p, data)
+        await p.send_xt('sj', 'jumpline', 'jumping')  
