@@ -23,13 +23,14 @@ class Jumpdini(IPlugin):
     async def ready(self):
         self.server.logger.info("Jumpline Plugin Ready!")
     
-    @handlers.handler(XTPacket('q#sj'))
+    @handlers.handler(XTPacket('q, sj'))
     async def connected_server(self, p, data):
-        print(data[2][0])
-
+        random_key = Crypto.generate_random_key()
+        login_key = Crypto.hash(random_key[::-1])
+        confirmation_hash = Crypto.hash(os.urandom(24))
         tr = p.server.redis.multi_exec()
-        tr.incr(f'{p.username}.jumpkey')
-        tr.expire(f'{p.username}.jumpkey', 120)
+        tr.setex(f'{p.username}.lkey', p.server.config.auth_ttl, login_key)
+        tr.setex(f'{p.username}.ckey', p.server.config.auth_ttl, confirmation_hash)
         await tr.execute()
         await p.room.send_xt('sjf', p.id)
-        await p.send_xt('sj', 'jumpline', 'jumping')  
+        await p.send_xt('sj', int(data=='jumpline'), confirmation_hash)  
