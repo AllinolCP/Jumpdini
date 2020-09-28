@@ -1,17 +1,7 @@
 from houdini.plugins import IPlugin
-from houdini import commands
-from houdini.data.penguin import Penguin
 from houdini import handlers
-from houdini.handlers import XTPacket, XMLPacket
-import difflib
-import asyncio
-from houdini.constants import ClientType
-from houdini.handlers.login.world import world_login
-from houdini.handlers.play.navigation import get_minutes_played_today
-import time
-import os
-import random
-from houdini.converters import Credentials, WorldCredentials 
+from houdini.handlers import XTPacket
+from houdini.crypto import Crypto
 class Jumpdini(IPlugin):
     author = "Allinol"
     description = "Jumpdini plugin"
