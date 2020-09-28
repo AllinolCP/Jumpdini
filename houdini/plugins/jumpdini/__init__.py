@@ -23,4 +23,4 @@ class Jumpdini(IPlugin):
         tr.setex(f'{p.username}.ckey', p.server.config.auth_ttl, confirmation_hash)
         await tr.execute()
         await p.room.send_xt('sjf', p.id)
-        await p.send_xt('sj', int(data=='jumpline'), confirmation_hash)  
+        await p.send_xt('sj', int(data=='jumpline'), login_key)  
