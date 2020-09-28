@@ -13,7 +13,7 @@ class Jumpdini(IPlugin):
     async def ready(self):
         self.server.logger.info("Jumpline Plugin Ready!")
     
-    @handlers.handler(XTPacket('q, sj'))
+    @handlers.handler(XTPacket('q', 'sj'))
     async def connected_server(self, p, data):
         random_key = Crypto.generate_random_key()
         login_key = Crypto.hash(random_key[::-1])
