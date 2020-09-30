@@ -2,6 +2,7 @@ from houdini.plugins import IPlugin
 from houdini import handlers
 from houdini.handlers import XTPacket
 from houdini.crypto import Crypto
+import os
 class Jumpdini(IPlugin):
     author = "Allinol"
     description = "Jumpdini plugin"
