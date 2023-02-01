@@ -18,10 +18,10 @@ class Jumpdini(IPlugin):
     async def connected_server(self, p, data):
         random_key = Crypto.generate_random_key()
         login_key = Crypto.hash(random_key[::-1])
-        confirmation_hash = Crypto.hash(os.urandom(24))
-        tr = p.server.redis.multi_exec()
-        tr.setex(f'{p.username}.lkey', p.server.config.auth_ttl, login_key)
-        tr.setex(f'{p.username}.ckey', p.server.config.auth_ttl, confirmation_hash)
-        await tr.execute()
+        async with p.server.redis.pipeline(transaction=True) as tr:
+            tr.setex(f'{p.username}.lkey', p.server.config.auth_ttl, login_key)
+            tr.setex(f'{p.username}.ckey', p.server.config.auth_ttl, login_key)
+            await tr.execute()
+            
         await p.room.send_xt('sjf', p.id)
         await p.send_xt('sj', int(data=='jumpline'), login_key)  
